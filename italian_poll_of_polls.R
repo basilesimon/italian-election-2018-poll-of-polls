@@ -84,11 +84,13 @@ temporary_merge <- merge(data_2018, data_2017, all=TRUE)
 data <- merge(temporary_merge, data_2016, all=TRUE)
 
 # rename
-data <- data %>% rename(date = clean_date, party = variable)
+data <- data %>% rename(date = clean_date, party = variable) %>%
+  group_by(party) %>%
+  mutate(mean20 = rollmean(value, k = 30, fill = NA, align = "right"))
 
 ggplot(data, 
-       aes(date, value, color=party)) + 
-  geom_point(aes(shape="21", alpha=1/100)) + 
-  geom_ma(ma_fun = SMA, n = 8)
+       aes(date, color=party)) + 
+  geom_point(aes(y=value, shape="21", alpha=1/100)) + 
+  geom_line(aes(y=mean20, color=party))
 
 write_csv(data, "data.csv")
