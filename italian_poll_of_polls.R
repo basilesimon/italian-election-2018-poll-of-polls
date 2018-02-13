@@ -86,11 +86,13 @@ data <- merge(temporary_merge, data_2016, all=TRUE)
 # rename
 data <- data %>% rename(date = clean_date, party = variable) %>%
   group_by(party) %>%
-  mutate(mean20 = rollmean(value, k = 30, fill = NA, align = "right"))
+  mutate(mean20 = rollmean(value, k = 30, fill = NA, align = "right"),
+         mean20_missing = rollapply(value, width = 20, fill = NA, partial = TRUE, 
+                                    FUN=function(x) mean(x, na.rm=TRUE), align = "right"))
 
 ggplot(data, 
        aes(date, color=party)) + 
   geom_point(aes(y=value, shape="21", alpha=1/100)) + 
-  geom_line(aes(y=mean20, color=party))
+  geom_line(aes(y=mean20_missing, color=party))
 
 write_csv(data, "data.csv")
