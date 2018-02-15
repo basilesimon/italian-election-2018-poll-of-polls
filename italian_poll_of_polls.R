@@ -81,13 +81,15 @@ ggplot(data = data_2016, aes(clean_date, value, color=variable)) +
 # merge data together now
 
 temporary_merge <- merge(data_2018, data_2017, all=TRUE)
-data <- merge(temporary_merge, data_2016, all=TRUE)
+# data <- merge(temporary_merge, data_2016, all=TRUE)
+
+# exclude 2016 from dataset
+data <- temporary_merge
 
 # rename
 data <- data %>% rename(date = clean_date, party = variable) %>%
   group_by(party) %>%
-  mutate(mean20 = rollmean(value, k = 30, fill = NA, align = "right"),
-         mean20_missing = rollapply(value, width = 20, fill = NA, partial = TRUE, 
+  mutate(mean20_missing = rollapply(value, width = 20, fill = NA, partial = TRUE, 
                                     FUN=function(x) mean(x, na.rm=TRUE), align = "right"))
 
 ggplot(data, 
